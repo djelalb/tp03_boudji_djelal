@@ -36,13 +36,15 @@ export class CatalogueComponent implements OnInit {
     this.filteredProducts$.subscribe(products => this.updatePagination(products));
   }
 
-  filterProducts(filters: { term: string; category: string }) {
+  filterProducts(filters: { term: string; category: string; minPrice: number | null; maxPrice: number | null }) {
     this.filteredProducts$ = this.products$.pipe(
       map(products =>
         products.filter(product => {
           const matchesName = product.name.toLowerCase().includes(filters.term.toLowerCase());
           const matchesCategory = product.category.toLowerCase().includes(filters.category.toLowerCase());
-          return matchesName && matchesCategory;
+          const matchesMinPrice = filters.minPrice !== null ? product.price >= filters.minPrice : true;
+          const matchesMaxPrice = filters.maxPrice !== null ? product.price <= filters.maxPrice : true;
+          return matchesName && matchesCategory && matchesMinPrice && matchesMaxPrice;
         })
       ),
       startWith([])
